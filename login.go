@@ -16,7 +16,7 @@ import (
 
 const (
 	reCaptchaError       = "reCAPTCHA present on the page"
-	secondStepCodePrompt = "Please enter 2FA code (check your inbox):"
+	secondStepCodePrompt = "Two-step authentication security code:"
 )
 
 func authToken(client *http.Client) (token string, error error) {
@@ -31,7 +31,6 @@ func authToken(client *http.Client) (token string, error error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
 
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
@@ -45,7 +44,14 @@ func authToken(client *http.Client) (token string, error error) {
 	}
 
 	input := querySelector(doc, inputLoginTokenSelector)
-	return attrVal(input, "value"), nil
+
+	token = attrVal(input, "value")
+
+	if err := resp.Body.Close(); err != nil {
+		return token, err
+	}
+
+	return token, nil
 }
 
 func secondStepAuth(client *http.Client, body io.ReadCloser, requestText func(string) string) error {
@@ -88,7 +94,9 @@ func secondStepAuth(client *http.Client, body io.ReadCloser, requestText func(st
 		input = querySelector(doc, inputSecondStepAuthTokenSelector)
 		token = attrVal(input, "value")
 
-		resp.Body.Close()
+		if err := resp.Body.Close(); err != nil {
+			return err
+		}
 	}
 
 	return nil
