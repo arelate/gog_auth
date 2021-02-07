@@ -48,7 +48,7 @@ func authToken(client *http.Client) (token string, error error) {
 	return attrVal(input, "value"), nil
 }
 
-func secondStepAuth(client *http.Client, body io.ReadCloser, sfa func(string) (string, error)) error {
+func secondStepAuth(client *http.Client, body io.ReadCloser, requestText func(string) string) error {
 
 	doc, err := html.Parse(body)
 	if err != nil {
@@ -61,12 +61,9 @@ func secondStepAuth(client *http.Client, body io.ReadCloser, sfa func(string) (s
 	for token != "" {
 
 		code := ""
-		if sfa != nil {
+		if requestText != nil {
 			for len(code) != 4 {
-				code, err = sfa(secondStepCodePrompt)
-				if err != nil {
-					return err
-				}
+				code = requestText(secondStepCodePrompt)
 			}
 		} else {
 			return fmt.Errorf("2FA token is requied, cannot get it with nil callback")
@@ -106,7 +103,23 @@ Overall flow is:
 - Check for presence of second step auth token
 - (Optional) Post 4 digit second step auth code
 */
-func Login(client *http.Client, username, password string, sfa func(string) (string, error)) error {
+func Login(client *http.Client, username, password string, requestText func(string) string) error {
+
+	if username == "" {
+		resp := requestText("GOG.com username:")
+		if resp == "" {
+			return fmt.Errorf("username cannot be empty")
+		}
+		username = resp
+	}
+
+	if password == "" {
+		resp := requestText(fmt.Sprintf("Enter password for %s:", username))
+		if resp == "" {
+			return fmt.Errorf("password cannot be empty")
+		}
+		password = resp
+	}
 
 	token, err := authToken(client)
 	if err != nil {
@@ -128,7 +141,7 @@ func Login(client *http.Client, username, password string, sfa func(string) (str
 		return err
 	}
 
-	if err := secondStepAuth(client, resp.Body, sfa); err != nil {
+	if err := secondStepAuth(client, resp.Body, requestText); err != nil {
 		return err
 	}
 
