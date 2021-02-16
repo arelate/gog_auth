@@ -2,20 +2,20 @@
 // Use of this source code is governed by an MIT-style license that can be
 // found in the LICENSE file.
 
-package gogauth
+package gog_auth
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/arelate/gogauthurls"
-	"github.com/arelate/gogtypes"
+	"github.com/arelate/gog_auth_urls"
+	"github.com/arelate/gog_types"
 )
 
 func LoggedIn(client *http.Client) (bool, error) {
 
-	resp, err := client.Get(gogauthurls.UserData().String())
+	resp, err := client.Get(gog_auth_urls.UserData().String())
 
 	if err != nil {
 		return false, err
@@ -26,7 +26,7 @@ func LoggedIn(client *http.Client) (bool, error) {
 		return false, err
 	}
 
-	var ud gogtypes.UserData
+	var ud gog_types.UserData
 
 	err = json.Unmarshal(respBody, &ud)
 	if err != nil {

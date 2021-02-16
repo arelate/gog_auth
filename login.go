@@ -2,12 +2,12 @@
 // Use of this source code is governed by an MIT-style license that can be
 // found in the LICENSE file.
 
-package gogauth
+package gog_auth
 
 import (
 	"errors"
 	"fmt"
-	"github.com/arelate/gogauthurls"
+	"github.com/arelate/gog_auth_urls"
 	"golang.org/x/net/html"
 	"io"
 	"net/http"
@@ -21,8 +21,8 @@ const (
 
 func authToken(client *http.Client) (token string, error error) {
 
-	req, err := http.NewRequest(http.MethodGet, gogauthurls.AuthHost().String(), nil)
-	gogauthurls.AddAuthHostDefaultHeaders(req)
+	req, err := http.NewRequest(http.MethodGet, gog_auth_urls.AuthHost().String(), nil)
+	gog_auth_urls.AddAuthHostDefaultHeaders(req)
 	if err != nil {
 		return "", err
 	}
@@ -77,9 +77,9 @@ func secondStepAuth(client *http.Client, body io.ReadCloser, requestText func(st
 
 		data := secondStepData(code, token)
 
-		req, _ := http.NewRequest(http.MethodPost, gogauthurls.LoginTwoStep().String(), strings.NewReader(data))
-		gogauthurls.AddLoginHostDefaultHeaders(req)
-		gogauthurls.SetLoginFormHeaders(req, gogauthurls.LoginTwoStep())
+		req, _ := http.NewRequest(http.MethodPost, gog_auth_urls.LoginTwoStep().String(), strings.NewReader(data))
+		gog_auth_urls.AddLoginHostDefaultHeaders(req)
+		gog_auth_urls.SetLoginFormHeaders(req, gog_auth_urls.LoginTwoStep())
 
 		resp, err := client.Do(req)
 		if err != nil {
@@ -136,13 +136,13 @@ func Login(client *http.Client, username, password string, requestText func(stri
 
 	data := loginData(username, password, token)
 
-	req, err := http.NewRequest(http.MethodPost, gogauthurls.LoginCheck().String(), strings.NewReader(data))
+	req, err := http.NewRequest(http.MethodPost, gog_auth_urls.LoginCheck().String(), strings.NewReader(data))
 	if err != nil {
 		return err
 	}
-	gogauthurls.AddLoginHostDefaultHeaders(req)
+	gog_auth_urls.AddLoginHostDefaultHeaders(req)
 	// GOG.com redirects initial auth request from authHost to loginHost.
-	gogauthurls.SetLoginFormHeaders(req, gogauthurls.LoginHost())
+	gog_auth_urls.SetLoginFormHeaders(req, gog_auth_urls.LoginHost())
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -1,4 +1,4 @@
-# gogauth
+# gog_auth
 
 Implementation of the GOG.com website (as in "not Galaxy") authentication flow, including 2FA. Captcha is detected, not supported.
 
@@ -23,7 +23,7 @@ following:
 - Load persistent cookies
 - Create a http.CookieJar and add those cookies
 - Create a http.Client with that cookieJar
-- Check if the gogauth.LoggedIn is true
+- Check if the gog_auth.LoggedIn is true
     - If it is: interact with AccountProducts, Wishlist, etc. types that require authentication
     - If it isn't: Login with a username, password, optional 2FA
 - At the end of the session - save persistent cookies from the cookieJar
