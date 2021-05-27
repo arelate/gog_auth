@@ -10,21 +10,21 @@ import (
 	"strings"
 )
 
-func inputLoginTokenSelector(n *html.Node) bool {
+func inputLoginToken(n *html.Node) bool {
 	return n != nil &&
 		n.Type == html.ElementNode &&
 		n.Data == "input" &&
 		attrVal(n, "name") == "login[_token]"
 }
 
-func inputSecondStepAuthTokenSelector(n *html.Node) bool {
+func inputSecondStepAuthToken(n *html.Node) bool {
 	return n != nil &&
 		n.Type == html.ElementNode &&
 		n.Data == "input" &&
 		attrVal(n, "name") == "second_step_authentication[_token]"
 }
 
-func scriptReCaptchaSelector(n *html.Node) bool {
+func scriptReCaptcha(n *html.Node) bool {
 	return n != nil &&
 		n.Type == html.ElementNode &&
 		n.Data == "script" &&

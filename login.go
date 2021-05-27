@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/arelate/gog_auth_urls"
+	"github.com/boggydigital/match_node"
 	"golang.org/x/net/html"
 	"io"
 	"net/http"
@@ -38,12 +39,12 @@ func authToken(client *http.Client) (token string, error error) {
 	}
 
 	// check for captcha presence
-	if querySelector(doc, scriptReCaptchaSelector) != nil {
+	if match_node.Match(doc, scriptReCaptcha) != nil {
 		// TODO: Write how to add cookie from the browser to allow user to unblock themselves
 		return "", errors.New(reCaptchaError)
 	}
 
-	input := querySelector(doc, inputLoginTokenSelector)
+	input := match_node.Match(doc, inputLoginToken)
 
 	token = attrVal(input, "value")
 
@@ -61,7 +62,7 @@ func secondStepAuth(client *http.Client, body io.ReadCloser, requestText func(st
 		return err
 	}
 
-	input := querySelector(doc, inputSecondStepAuthTokenSelector)
+	input := match_node.Match(doc, inputSecondStepAuthToken)
 	token := attrVal(input, "value")
 
 	for token != "" {
@@ -91,7 +92,7 @@ func secondStepAuth(client *http.Client, body io.ReadCloser, requestText func(st
 			return err
 		}
 
-		input = querySelector(doc, inputSecondStepAuthTokenSelector)
+		input = match_node.Match(doc, inputSecondStepAuthToken)
 		token = attrVal(input, "value")
 
 		if err := resp.Body.Close(); err != nil {
